@@ -686,13 +686,13 @@ func buildBSTByPostOrder(arr []int, start int, end int) *TreeNode {
 		return nil
 	}
 	head := NewTreeNode(arr[end])
-	less := -1
-	more := end
+	less := math.MinInt
+	more := math.MaxInt
 	for i := start; i < end; i++ {
 		if arr[end] > arr[i] {
 			less = i
 		} else {
-			if more == end {
+			if more == math.MaxInt {
 				more = i
 			}
 		}
