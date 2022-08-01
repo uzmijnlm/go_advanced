@@ -253,24 +253,46 @@ func IsSearchBinaryTree(node *TreeNode) bool {
 		return true
 	}
 
-	if node.Left != nil {
-		if node.Left.Value >= node.Value {
-			return false
-		}
-	}
-	if node.Right != nil {
-		if node.Right.Value <= node.Value {
-			return false
-		}
+	left := isSBT(node.Left)
+	right := isSBT(node.Right)
+
+	return node.Value > left.max && node.Value < right.min && left.isSBT && right.isSBT
+}
+
+func isSBT(node *TreeNode) *NodeWithStat {
+	if node == nil {
+		return newNodeWithStat()
 	}
 
-	return IsSearchBinaryTree(node.Left) && IsSearchBinaryTree(node.Right)
+	left := isSBT(node.Left)
+	right := isSBT(node.Right)
+
+	stat := newNodeWithStat()
+	stat.max = int(math.Max(math.Max(float64(left.max), float64(right.max)), float64(node.Value)))
+	stat.min = int(math.Min(math.Min(float64(left.min), float64(right.min)), float64(node.Value)))
+	stat.isSBT = node.Value > left.max && node.Value < right.min && left.isSBT && right.isSBT
+
+	return stat
+}
+
+type NodeWithStat struct {
+	max   int
+	min   int
+	isSBT bool
+}
+
+func newNodeWithStat() *NodeWithStat {
+	return &NodeWithStat{
+		max:   math.MinInt,
+		min:   math.MaxInt,
+		isSBT: true,
+	}
 }
 
 // IsCompleteBinaryTree 判断是否为完全二叉树。要么全满，要么从左到右依次填满
 // 宽度优先遍历。在遍历过程中判断：
 // a.如果一个节点只有右节点没有左节点，则一定不是满二叉树
-// b.如果一个节点只有左节点，那么后面所有节点都不能有子节点
+// b.如果一个节点只有左节点，或者左右节点都没有，那么后面所有节点都不能有子节点
 func IsCompleteBinaryTree(node *TreeNode) bool {
 	if node == nil {
 		return true
